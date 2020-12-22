@@ -1,0 +1,44 @@
+<?xml-stylesheet type="text/xsl" href="http://gavwu.github.io/sitemap.xsl"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  <url>
+    <loc>http://gavwu.github.io/</loc>
+    <lastmod>2020-12-19T21:53:45+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://gavwu.github.io/post/</loc>
+    <lastmod>2020-12-19T21:53:45+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://gavwu.github.io/post/the-way-of-using-wire-dependency-injection/</loc>
+    <lastmod>2020-12-19T21:53:45+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://gavwu.github.io/post/how-i-use-my-macbook-pro-with-keyboard-only/</loc>
+    <lastmod>2020-12-16T22:01:44+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://gavwu.github.io/categories/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://gavwu.github.io/tags/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+</urlset>

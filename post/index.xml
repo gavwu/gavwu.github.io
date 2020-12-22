@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on gavwu - Focus On Backend</title>
+    <link>http://gavwu.github.io/post/</link>
+    <description>Recent content in Posts on gavwu - Focus On Backend</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sat, 19 Dec 2020 21:53:45 +0000</lastBuildDate>
+    
+	<atom:link href="http://gavwu.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>The way of using wire (dependency injection)</title>
+      <link>http://gavwu.github.io/post/the-way-of-using-wire-dependency-injection/</link>
+      <pubDate>Sat, 19 Dec 2020 21:53:45 +0000</pubDate>
+      
+      <guid>http://gavwu.github.io/post/the-way-of-using-wire-dependency-injection/</guid>
+      <description>Wire is a Go dependency injection tool, open source by Google
+ Wire is a code generation tool that automates connecting components using dependency injection.
+ I know there are a lot of acticles writing about how to use wire in project
+So I won&#39;t discuss the functionality of wire in this post
+I would rather combine the design of injection dependency and the functionality provided by wire to talk about the correct way of using wire</description>
+    </item>
+    
+    <item>
+      <title>How I use my Macbook Pro with keyboard only</title>
+      <link>http://gavwu.github.io/post/how-i-use-my-macbook-pro-with-keyboard-only/</link>
+      <pubDate>Wed, 16 Dec 2020 22:01:44 +0000</pubDate>
+      
+      <guid>http://gavwu.github.io/post/how-i-use-my-macbook-pro-with-keyboard-only/</guid>
+      <description>Alfred Alfred is like spotlight vim plugin for browser I am using Chrome right now
+I added Vimium to my extension, and I barely use mouse for browsing website, really great tool for vim user
+Connect Bluetooth Device I found that I can&#39;t directly use mac built-in system-preference to connect Editor with Vim I was using IDE all the time, and most of them are great editor
+But I started realizing it is a little bit hard for me to control a IDE with keyboard-only, so I started using Vim as my primary editor</description>
+    </item>
+    
+  </channel>
+</rss>

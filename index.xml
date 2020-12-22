@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>gavwu - Focus On Backend</title>
+    <link>http://gavwu.github.io/</link>
+    <description>Recent content on gavwu - Focus On Backend</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sat, 19 Dec 2020 21:53:45 +0000</lastBuildDate>
+    
+        <atom:link href="http://gavwu.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>The way of using wire (dependency injection)</title>
+      <link>http://gavwu.github.io/post/the-way-of-using-wire-dependency-injection/</link>
+      <pubDate>Sat, 19 Dec 2020 21:53:45 +0000</pubDate>
+      
+      <guid>http://gavwu.github.io/post/the-way-of-using-wire-dependency-injection/</guid>
+      
+        <description>&lt;p&gt;&lt;a href=&#34;https://github.com/google/wire&#34;&gt;Wire&lt;/a&gt; is a Go dependency injection tool, open source by Google&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Wire is a code generation tool that automates connecting components using dependency injection.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;I know there are a lot of acticles writing about &lt;code&gt;how to use wire in project&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;So I won&#39;t discuss &lt;code&gt;the functionality of wire&lt;/code&gt; in this post&lt;/p&gt;
+&lt;p&gt;I would rather combine the &lt;code&gt;design of injection dependency&lt;/code&gt; and &lt;code&gt;the functionality provided by wire&lt;/code&gt; to talk about &lt;strong&gt;the correct way of using wire&lt;/strong&gt;&lt;/p&gt;
+&lt;h2 id=&#34;what-is-dependency-injection&#34;&gt;What is dependency injection&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;In software engineering, dependency injection is a technique in which an object receives other objects that it depends on. These other objects are called dependencies.&lt;/p&gt;
+&lt;p&gt;From &lt;a href=&#34;https://en.wikipedia.org/wiki/Dependency_injection&#34;&gt;wiki&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;From my point of view(as a developer), dependency injection is just the thing that gives me the ability to control &lt;code&gt;how to construct&lt;/code&gt; a thing(AKA &lt;code&gt;inversion of control&lt;/code&gt;), this thing could be a service or just a tool&lt;/p&gt;
+&lt;p&gt;here is an example&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;
+&lt;span class=&#34;kd&#34;&gt;type&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;Service&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;struct&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+	&lt;span class=&#34;nx&#34;&gt;store&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;Store&lt;/span&gt;
+	&lt;span class=&#34;o&#34;&gt;...&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+&lt;span class=&#34;kd&#34;&gt;type&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;Store&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;interface&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+	&lt;span class=&#34;nf&#34;&gt;Create&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+	&lt;span class=&#34;o&#34;&gt;...&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;the code says a service need a &lt;code&gt;Store&lt;/code&gt; to actually store its data, but it doesn&#39;t say what kind of store it uses&lt;/p&gt;
+&lt;p&gt;the type of the store is specified when we construct this service&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;
+&lt;span class=&#34;nx&#34;&gt;s&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;:=&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;Service&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+	&lt;span class=&#34;nx&#34;&gt;store&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;DatabaseStore&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;as this case, we use database to provide the &lt;code&gt;Store&lt;/code&gt; functionality&lt;/p&gt;
+&lt;p&gt;and we can do that because we follow the &lt;code&gt;dependency injection design pattern&lt;/code&gt;, imagine if we construct a &lt;code&gt;Service&lt;/code&gt; this way:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;
+&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;NewService&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;Service&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+	&lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;Service&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+		&lt;span class=&#34;nx&#34;&gt;store&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;NewDatabaseStore&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+	&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;and the &lt;code&gt;Service&lt;/code&gt; we make is using database store only which break the &lt;code&gt;dependency injection design pattern&lt;/code&gt; (becasue the user of the interface actually construct the interface)&lt;/p&gt;
+&lt;h2 id=&#34;a-little-bit-about-wire&#34;&gt;A little bit about wire&lt;/h2&gt;
+&lt;p&gt;Let&#39;s focus on what problems &lt;code&gt;wire&lt;/code&gt; solves for us&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;making changes to initialization code in applications with large dependency graphs is tedious and slow. Dependency injection tools like Wire aim to simplify the management of initialization code.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;as I said above, if we follow the dependency injection rule, we will need to construct things by us manually. we can do this by hand if we are just building samll tool or small project&lt;/p&gt;
+&lt;p&gt;If we are in a large code base, or a complex project with ten of hunderds of dependencies, writing them by hand is painful and error-prone&lt;/p&gt;
+&lt;p&gt;As long as we can &amp;ldquo;tell&amp;rdquo; &lt;code&gt;wire&lt;/code&gt; what dependency should be used in some specified places, the &lt;code&gt;wire&lt;/code&gt; will generate code that does the initialization for us&lt;/p&gt;
+&lt;h3 id=&#34;provider-and-injector&#34;&gt;Provider and Injector&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;Provider&lt;/code&gt; and &lt;code&gt;Injector&lt;/code&gt; are two important concept&lt;/p&gt;
+&lt;p&gt;Say it as simply as possible:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Provider: provide the dependency&lt;/li&gt;
+&lt;li&gt;Injector: construct service base on one or multi providers&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;What could be a provider&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;A function that return a dependency, like &lt;code&gt;NewDatabase() *DB&lt;/code&gt;, if a service needs a &lt;code&gt;*DB&lt;/code&gt; as its dependency, we can inject this function(as a provider)&lt;/li&gt;
+&lt;li&gt;A provider set, a common example of &lt;code&gt;binding Store interface to *DB&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span class=&#34;nx&#34;&gt;wire&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;NewSet&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;NewDatabase&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;wire&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;Bind&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;new&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;Store&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;new&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;DB&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;While &lt;code&gt;injector&lt;/code&gt; is like:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;
+&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;NewService&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;Service&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+	&lt;span class=&#34;nx&#34;&gt;wire&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;Build&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;
+		&lt;span class=&#34;c1&#34;&gt;// providers
+&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;	&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;problems-i-met-when-using-wire&#34;&gt;Problems I met when using wire&lt;/h2&gt;
+&lt;p&gt;suppose we have the class uml like this&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-plantuml&#34; data-lang=&#34;plantuml&#34;&gt;@startuml
+Class Manager
+Class Leader
+Interface Employee
+
+Manager --&amp;gt; Leader : contains &amp;gt;
+Manager --&amp;gt; Employee : contains &amp;gt;
+Leader --&amp;gt; Employee : contains &amp;gt;
+
+Class Engineer
+Class Assistant
+
+Engineer -up-&amp;gt; Employee #line.dotted : implemtent &amp;gt;
+Assistant -up-&amp;gt; Employee #line.dotted : implement &amp;gt;
+
+Manager --&amp;gt; Assistant #blue : need &amp;gt;
+Leader --&amp;gt; Engineer #blue : need &amp;gt;
+@enduml
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;As we can see in the diagram&lt;/p&gt;
+&lt;p&gt;The problem here is: both &lt;code&gt;Manager&lt;/code&gt; and &lt;code&gt;Leader&lt;/code&gt; need their &lt;code&gt;Employee&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;(like the diagram shows: the &lt;code&gt;Manager&lt;/code&gt; needs &lt;code&gt;Assistant&lt;/code&gt; and &lt;code&gt;Leader&lt;/code&gt; needs &lt;code&gt;Engineer&lt;/code&gt;)&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span class=&#34;kd&#34;&gt;type&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;Manager&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;struct&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+	&lt;span class=&#34;nx&#34;&gt;leader&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;staff&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;Leader&lt;/span&gt;
+	&lt;span class=&#34;nx&#34;&gt;worker&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;staff&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;Employee&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+&lt;span class=&#34;kd&#34;&gt;type&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;Leader&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;struct&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+	&lt;span class=&#34;nx&#34;&gt;worker&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;staff&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;Employee&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;but the &lt;code&gt;wire&lt;/code&gt; doesn&#39;t support &lt;a href=&#34;https://github.com/google/wire/blob/master/docs/faq.md#what-if-my-dependency-graph-has-two-dependencies-of-the-same-type&#34;&gt;two dependencies of the same type&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&#34;how-i-solve-the-problem&#34;&gt;How I solve the problem&lt;/h3&gt;
+</description>
+      
+    </item>
+    
+    <item>
+      <title>How I use my Macbook Pro with keyboard only</title>
+      <link>http://gavwu.github.io/post/how-i-use-my-macbook-pro-with-keyboard-only/</link>
+      <pubDate>Wed, 16 Dec 2020 22:01:44 +0000</pubDate>
+      
+      <guid>http://gavwu.github.io/post/how-i-use-my-macbook-pro-with-keyboard-only/</guid>
+      
+        <description>&lt;h2 id=&#34;alfred&#34;&gt;Alfred&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.alfredapp.com/&#34;&gt;Alfred&lt;/a&gt; is like spotlight &lt;/p&gt;
+&lt;h2 id=&#34;vim-plugin-for-browser&#34;&gt;vim plugin for browser&lt;/h2&gt;
+&lt;p&gt;I am using &lt;code&gt;Chrome&lt;/code&gt; right now&lt;/p&gt;
+&lt;p&gt;I added &lt;a href=&#34;https://vimium.github.io&#34;&gt;Vimium&lt;/a&gt; to my extension, and I barely use mouse for browsing website, really great tool for vim user&lt;/p&gt;
+&lt;h2 id=&#34;connect-bluetooth-device&#34;&gt;Connect Bluetooth Device&lt;/h2&gt;
+&lt;p&gt;I found that I can&#39;t directly use mac built-in &lt;code&gt;system-preference&lt;/code&gt; to connect &lt;/p&gt;
+&lt;h2 id=&#34;editor-with-vim&#34;&gt;Editor with Vim&lt;/h2&gt;
+&lt;p&gt;I was using IDE all the time, and most of them are great editor&lt;/p&gt;
+&lt;p&gt;But I started realizing it is a little bit hard for me to control a IDE with keyboard-only, so I started using &lt;code&gt;Vim&lt;/code&gt; as my primary editor&lt;/p&gt;
+&lt;h3 id=&#34;vim-under-the-hood&#34;&gt;Vim under the hood&lt;/h3&gt;
+&lt;p&gt;Why my vim con&#39;t not copy-paste thing to other program (like my web browser)?&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;vim use different register to store the &lt;code&gt;copy&lt;/code&gt; data
+&lt;a href=&#34;https://vi.stackexchange.com/questions/84/how-can-i-copy-text-to-the-system-clipboard-from-vim&#34;&gt;ref&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;vim-command&#34;&gt;Vim Command&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;u&lt;/code&gt; - undo
+&lt;code&gt;.&lt;/code&gt; - repeat last change
+&lt;code&gt;@:&lt;/code&gt; - repeat last &lt;strong&gt;:&lt;/strong&gt; command
+&lt;code&gt;:!&amp;lt;command&amp;gt;&lt;/code&gt; - run shell command in vim
+&lt;code&gt;Ctrl-r&lt;/code&gt; - redo
+&lt;code&gt;Ctrl-O&lt;/code&gt; - go back&lt;/p&gt;
+&lt;h3 id=&#34;vim-plugins&#34;&gt;Vim Plugins&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/preservim/nerdcommenter&#34;&gt;nerdcommenter&lt;/a&gt; is a tool for easily toggle comment when you program
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;&amp;lt;Leader&amp;gt;cc&lt;/code&gt; comment&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;problems-i-met&#34;&gt;Problems I met&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;using &lt;code&gt;source&lt;/code&gt; from bash to source the &lt;code&gt;$MYVIMRC&lt;/code&gt; file, we should do &lt;code&gt;source $MYVIMRC&lt;/code&gt; in vim &lt;code&gt;:&lt;/code&gt; command mode&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+      
+    </item>
+    
+  </channel>
+</rss>
